@@ -1,27 +1,23 @@
 class no_of1_constraints;
-  rand bit [7:0] var;
-
-  constraint odd_ones_constraint {
-    count_ones(var) %2 == 1;
-    // or
-    popcount(var) %2 == 1;
-  }
+  rand bit [7:0] data;
 
   constraint odd_ones_no_consecutive {
-    count_ones(var) %2 == 1;
+    $countones(data) %2 == 1;
 
-    foreach (var[i]) begin
+    foreach (data[i]) {
       if(i < 7)
-        var[i] != 1 || var[i+1] != 1;
-    end
+        data[i] != 1 || data[i+1] != 1;
+      }
   }
-
-  function int count_ones (input bit [7:0] val);
-    int count;
-    foreach (val[i]) begin
-      if(val[i])
-        count++;
-    return count;
-    end 
-  endfunction
 endclass : no_of1_constraints
+
+module tb ();
+ no_of1_constraints test;
+
+ initial begin
+  test = new();
+
+  assert(test.randomize()) else $error("randomization failed");
+  $display("the randomized value: %b", test.data);
+ end
+endmodule
